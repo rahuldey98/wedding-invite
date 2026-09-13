@@ -7,7 +7,7 @@ export const ScratchCard: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Generate concentric radial dot halo matching original Framer design
+  // Generate concentric radial dot halo for revealed crimson card
   const radialDots = useMemo(() => {
     const dots: { cx: number; cy: number; r: number; opacity: number; key: string }[] = [];
     const centerX = 170;
@@ -61,6 +61,8 @@ export const ScratchCard: React.FC = () => {
     if (!canvas || !container) return;
 
     const rect = container.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
     const dpr = window.devicePixelRatio || 1;
 
     canvas.width = rect.width * dpr;
@@ -77,30 +79,81 @@ export const ScratchCard: React.FC = () => {
 
     // Subtle golden sparkle texture
     ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-    for (let i = 0; i < 180; i++) {
+    for (let i = 0; i < 160; i++) {
       ctx.fillRect(Math.random() * rect.width, Math.random() * rect.height, 1.8, 1.8);
     }
     ctx.fillStyle = 'rgba(120, 0, 0, 0.08)';
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 60; i++) {
       ctx.fillRect(Math.random() * rect.width, Math.random() * rect.height, 1.4, 1.4);
     }
 
-    // "Scratch to reveal" Serif Text
-    ctx.fillStyle = '#6E0B14';
-    ctx.font = 'normal 23px "Instrument Serif", "Inria Serif", Georgia, serif';
+    // 1. "Save The Date!" Script on Yellow Card (Matching user screenshot)
+    ctx.save();
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = '#FFFFFF';
+    const scriptSize = Math.max(26, Math.min(34, rect.width * 0.1));
+    ctx.font = `${scriptSize}px "Great Vibes", "Italianno", cursive`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Scratch to reveal', rect.width / 2, rect.height / 2);
+    ctx.fillText('Save The Date!', rect.width / 2, rect.height * 0.28);
+    ctx.restore();
+
+    // 2. "Scratch to reveal" Serif Text in Center
+    ctx.save();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#6E0B14';
+    const serifSize = Math.max(16, Math.min(21, rect.width * 0.062));
+    ctx.font = `normal ${serifSize}px "Instrument Serif", "Inria Serif", Georgia, serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Scratch to reveal', rect.width / 2, rect.height * 0.48);
+    ctx.restore();
+
+    // 3. "29.01.2027" Date on Yellow Card (Matching user screenshot)
+    ctx.save();
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = '#FFFFFF';
+    const dateSize = Math.max(28, Math.min(38, rect.width * 0.115));
+    ctx.font = `900 ${dateSize}px "Orbitron", -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('29.01.2027', rect.width / 2, rect.height * 0.74);
+    ctx.restore();
 
     setIsScratched(false);
     lastPointRef.current = null;
   }, []);
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Observe container resizing for robust initialization
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+          initCanvas();
+        }
+      }
+    });
+    ro.observe(container);
+
+    // Re-draw once web fonts (Great Vibes, Orbitron) are fully loaded
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        initCanvas();
+      });
+    }
+
     initCanvas();
-    const handleResize = () => initCanvas();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    window.addEventListener('resize', initCanvas);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', initCanvas);
+    };
   }, [initCanvas]);
 
   const scratch = (clientX: number, clientY: number) => {
@@ -198,9 +251,9 @@ export const ScratchCard: React.FC = () => {
     <div className="w-full flex flex-col items-center py-6 px-4 bg-white">
       <div
         ref={containerRef}
-        className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-[2.26/1] rounded-[22px] overflow-hidden shadow-xl select-none cursor-grab active:cursor-grabbing bg-[#640912]"
+        className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-[2.26/1] rounded-[22px] overflow-hidden shadow-xl select-none cursor-grab active:cursor-grabbing bg-[#640912] border-[1.5px] border-[#6E0B14]"
       >
-        {/* Exact Revealed Card Matching Original Image Screenshot */}
+        {/* Exact Revealed Crimson Velvet Card with Radial Dots Halo */}
         <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#5a0810] via-[#750e19] to-[#5a0810] flex flex-col items-center justify-center overflow-hidden select-none">
           
           {/* Concentric Radial Dots Halo */}
@@ -224,11 +277,11 @@ export const ScratchCard: React.FC = () => {
           {/* Ambient Glow Center */}
           <div className="absolute w-48 h-28 rounded-full bg-white/10 blur-xl pointer-events-none" />
 
-          {/* Text Content Container */}
+          {/* Text Content Container on Revealed Layer */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 -mt-1">
             {/* "Save The Date!" in Glowing White Script Calligraphy */}
             <span
-              className="font-script text-[32px] sm:text-[38px] text-white tracking-wide leading-tight select-none"
+              className="font-script text-[30px] sm:text-[36px] text-white tracking-wide leading-tight select-none"
               style={{
                 textShadow:
                   '0 0 8px rgba(255, 255, 255, 0.95), 0 0 16px rgba(255, 255, 255, 0.65), 0 0 24px rgba(255, 255, 255, 0.35)',
@@ -250,7 +303,7 @@ export const ScratchCard: React.FC = () => {
           </div>
         </div>
 
-        {/* Scratchable Yellow Top Canvas Layer */}
+        {/* Scratchable Yellow Top Canvas Layer with Date and Save The Date */}
         <canvas
           ref={canvasRef}
           onMouseDown={handleMouseDown}

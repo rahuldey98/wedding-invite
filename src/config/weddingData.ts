@@ -44,7 +44,7 @@ export const weddingData: WeddingConfig = {
     {
       id: "gaye-holud",
       title: "Gaye Holud",
-      time: "29th January at 11:30AM",
+      time: "29th January at 10:00AM",
       image: "https://framerusercontent.com/images/WrfjNxr7VjXKuKn5TveLCxhc20.png"
     },
     {

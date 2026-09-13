@@ -63,7 +63,7 @@ export const weddingData: WeddingConfig = {
   venue: {
     title: "Where We Celebrate",
     subtitle: "Venue",
-    image: "https://framerusercontent.com/images/0mK5EEB7YyosOg9eyRtmM3SvrI.png",
+    image: "./assets/venue-map.png",
     googleMapsUrl: "https://www.google.com/maps/place/23.224608,87.086432/data=!4m6!3m5!1s0!7e2!8m2!3d23.224608!4d87.086432!18m1!1e1"
   }
 };

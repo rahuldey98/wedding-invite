@@ -39,7 +39,7 @@ export const VenueSection = () => {
         >
           <iframe
             title="Venue Location Map"
-            src="https://maps.google.com/maps?q=23.224608,87.086432&hl=en&z=15&output=embed"
+            src="https://maps.google.com/maps?q=23.2247774,87.0867049&hl=en&z=16&output=embed"
             className="w-full h-full border-0"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

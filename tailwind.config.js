@@ -29,9 +29,10 @@ export default {
       fontFamily: {
         display: ['"Instrument Serif"', 'Georgia', 'serif'],
         inria: ['"Inria Serif"', 'Georgia', 'serif'],
-        script: ['"Italianno"', 'cursive'],
+        script: ['"Great Vibes"', '"Italianno"', 'cursive'],
         'script-accent': ['"Lobster Two"', 'cursive'],
         body: ['"Judson"', 'Georgia', 'serif'],
+        orbitron: ['"Orbitron"', 'sans-serif'],
         sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       animation: {

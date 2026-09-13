@@ -73,7 +73,7 @@ export const ScratchCard: React.FC = () => {
 
     ctx.scale(dpr, dpr);
 
-    // Warm vibrant gold-yellow (#FFC800)
+    // Completely solid warm vibrant gold-yellow (#FFC800)
     ctx.fillStyle = '#FFC800';
     ctx.fillRect(0, 0, rect.width, rect.height);
 
@@ -87,40 +87,13 @@ export const ScratchCard: React.FC = () => {
       ctx.fillRect(Math.random() * rect.width, Math.random() * rect.height, 1.4, 1.4);
     }
 
-    // 1. "Save The Date!" Script on Yellow Card (Matching user screenshot)
-    ctx.save();
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
-    ctx.shadowBlur = 8;
-    ctx.fillStyle = '#FFFFFF';
-    const scriptSize = Math.max(26, Math.min(34, rect.width * 0.1));
-    ctx.font = `${scriptSize}px "Great Vibes", "Italianno", cursive`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Save The Date!', rect.width / 2, rect.height * 0.28);
-    ctx.restore();
-
-    // 2. "Scratch to reveal" Serif Text in Center
-    ctx.save();
-    ctx.shadowBlur = 0;
+    // "Scratch to reveal" Serif Text in Center
     ctx.fillStyle = '#6E0B14';
-    const serifSize = Math.max(16, Math.min(21, rect.width * 0.062));
+    const serifSize = Math.max(18, Math.min(24, rect.width * 0.07));
     ctx.font = `normal ${serifSize}px "Instrument Serif", "Inria Serif", Georgia, serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Scratch to reveal', rect.width / 2, rect.height * 0.48);
-    ctx.restore();
-
-    // 3. "29.01.2027" Date on Yellow Card (Matching user screenshot)
-    ctx.save();
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
-    ctx.shadowBlur = 12;
-    ctx.fillStyle = '#FFFFFF';
-    const dateSize = Math.max(28, Math.min(38, rect.width * 0.115));
-    ctx.font = `900 ${dateSize}px "Orbitron", -apple-system, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('29.01.2027', rect.width / 2, rect.height * 0.74);
-    ctx.restore();
+    ctx.fillText('Scratch to reveal', rect.width / 2, rect.height / 2);
 
     setIsScratched(false);
     lastPointRef.current = null;
@@ -130,7 +103,6 @@ export const ScratchCard: React.FC = () => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Observe container resizing for robust initialization
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
@@ -140,7 +112,6 @@ export const ScratchCard: React.FC = () => {
     });
     ro.observe(container);
 
-    // Re-draw once web fonts (Great Vibes, Orbitron) are fully loaded
     if (document.fonts) {
       document.fonts.ready.then(() => {
         initCanvas();
@@ -253,8 +224,8 @@ export const ScratchCard: React.FC = () => {
         ref={containerRef}
         className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-[2.26/1] rounded-[22px] overflow-hidden shadow-xl select-none cursor-grab active:cursor-grabbing bg-[#640912] border-[1.5px] border-[#6E0B14]"
       >
-        {/* Exact Revealed Crimson Velvet Card with Radial Dots Halo */}
-        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#5a0810] via-[#750e19] to-[#5a0810] flex flex-col items-center justify-center overflow-hidden select-none">
+        {/* Layer 1 (Underneath): Crimson Velvet Card with Radial Dots Halo & Glowing Date */}
+        <div className="absolute inset-0 z-0 w-full h-full bg-gradient-to-r from-[#5a0810] via-[#750e19] to-[#5a0810] flex flex-col items-center justify-center overflow-hidden select-none">
           
           {/* Concentric Radial Dots Halo */}
           <svg
@@ -277,8 +248,8 @@ export const ScratchCard: React.FC = () => {
           {/* Ambient Glow Center */}
           <div className="absolute w-48 h-28 rounded-full bg-white/10 blur-xl pointer-events-none" />
 
-          {/* Text Content Container on Revealed Layer */}
-          <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 -mt-1">
+          {/* Text Content on Revealed Layer (z-0, strictly under canvas) */}
+          <div className="flex flex-col items-center justify-center text-center px-4 -mt-1 pointer-events-none">
             {/* "Save The Date!" in Glowing White Script Calligraphy */}
             <span
               className="font-script text-[30px] sm:text-[36px] text-white tracking-wide leading-tight select-none"
@@ -303,7 +274,7 @@ export const ScratchCard: React.FC = () => {
           </div>
         </div>
 
-        {/* Scratchable Yellow Top Canvas Layer with Date and Save The Date */}
+        {/* Layer 2 (Top): Scratchable Solid Yellow Canvas Layer (z-10 on top) */}
         <canvas
           ref={canvasRef}
           onMouseDown={handleMouseDown}
@@ -313,7 +284,7 @@ export const ScratchCard: React.FC = () => {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className={`absolute inset-0 w-full h-full touch-none transition-opacity duration-700 ${
+          className={`absolute inset-0 z-10 w-full h-full touch-none transition-opacity duration-700 ${
             isScratched ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
         />

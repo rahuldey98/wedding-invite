@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: #FDFBF7;
+    color: #242220;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom 3D Perspective for Realistic Envelope Unboxing */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-x-180 {
+  transform: rotateX(180deg);
+}
+
+/* Elegant Paper Texture Effect */
+.bg-paper-pattern {
+  background-color: #FDFBF7;
+  background-image: radial-gradient(#E8DFD8 0.75px, transparent 0.75px), radial-gradient(#E8DFD8 0.75px, #FDFBF7 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}
+
+.bg-sand-pattern {
+  background-color: #F5EFEB;
+  background-image: radial-gradient(#DECFC4 0.65px, transparent 0.65px);
+  background-size: 24px 24px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FDFBF7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8E2823;
+}

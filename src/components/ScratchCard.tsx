@@ -127,9 +127,6 @@ export const ScratchCard: React.FC = () => {
     };
   }, [initCanvas]);
 
-  const gestureModeRef = useRef<'pending' | 'scrolling' | 'scratching' | null>(null);
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-
   const scratch = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -179,56 +176,19 @@ export const ScratchCard: React.FC = () => {
     checkScratchPercentage();
   };
 
-  // Touch Handlers: Allow seamless vertical page scrolling while enabling horizontal/scrub scratching
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
     if (e.touches.length > 0) {
-      const touch = e.touches[0];
-      touchStartRef.current = { x: touch.clientX, y: touch.clientY };
-      gestureModeRef.current = 'pending';
-      lastPointRef.current = null;
+      setIsDrawing(true);
+      scratch(e.touches[0].clientX, e.touches[0].clientY);
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (e.touches.length === 0 || !touchStartRef.current) return;
-    const touch = e.touches[0];
-    const dx = Math.abs(touch.clientX - touchStartRef.current.x);
-    const dy = Math.abs(touch.clientY - touchStartRef.current.y);
-
-    // If already decided user is scrolling the page, do not scratch
-    if (gestureModeRef.current === 'scrolling') {
-      return;
-    }
-
-    // Determine user intent if pending
-    if (gestureModeRef.current === 'pending') {
-      // If predominantly vertical motion, allow native page scroll
-      if (dy > 6 && dy > dx * 1.15) {
-        gestureModeRef.current = 'scrolling';
-        return;
-      }
-      // If horizontal or active scrubbing motion, switch to scratching
-      if (dx > 6 || (dx + dy > 10)) {
-        gestureModeRef.current = 'scratching';
-        setIsDrawing(true);
-        scratch(touch.clientX, touch.clientY);
-        return;
-      }
-    }
-
-    // Actively scratching
-    if (gestureModeRef.current === 'scratching') {
-      scratch(touch.clientX, touch.clientY);
-    }
+    if (!isDrawing || e.touches.length === 0) return;
+    scratch(e.touches[0].clientX, e.touches[0].clientY);
   };
 
   const handleTouchEnd = () => {
-    if (gestureModeRef.current === 'pending' && touchStartRef.current) {
-      // User performed a quick tap: dab scratch at that spot
-      scratch(touchStartRef.current.x, touchStartRef.current.y);
-    }
-    gestureModeRef.current = null;
-    touchStartRef.current = null;
     setIsDrawing(false);
     lastPointRef.current = null;
     checkScratchPercentage();
@@ -324,7 +284,7 @@ export const ScratchCard: React.FC = () => {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className={`absolute inset-0 z-10 w-full h-full touch-pan-y transition-opacity duration-700 ${
+          className={`absolute inset-0 z-10 w-full h-full touch-none transition-opacity duration-700 ${
             isScratched ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
         />
